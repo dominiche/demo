@@ -1,0 +1,177 @@
+---
+#
+# Copyright Fujitsu Australia Software Technology, IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+#
+# The network connection profile provides client applications the information about the target
+# blockchain network that are necessary for the applications to interact with it. These are all
+# knowledge that must be acquired from out-of-band sources. This file provides such a source.
+#
+name: "Network-Config-Test"
+
+#
+# Any properties with an "x-" prefix will be treated as application-specific, exactly like how naming
+# in HTTP headers or swagger properties work. The SDK will simply ignore these fields and leave
+# them for the applications to process. This is a mechanism for different components of an application
+# to exchange information that are not part of the standard schema described below. In particular,
+# the "x-type" property with the "hlfv1" value example below is used by Hyperledger Composer to
+# determine the type of Fabric networks (v0.6 vs. v1.0) it needs to work with.
+#
+x-type: "hlfv1"
+description: "The network used in the integration tests"
+version: 1.0.0
+
+
+client:
+  organization: Org1
+  credentialStore:
+    path: "/tmp/hfc-kvs"
+    cryptoStore:
+      path: "/tmp/hfc-cvs"
+    wallet: wallet-name
+
+
+channels:
+  foo:
+    orderers:
+      - orderer.example.com
+
+    peers:
+      peer0.org1.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+      peer1.org1.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: false
+
+    chaincodes:
+      - example02:v1
+      - marbles:1.0
+
+
+organizations:
+  Org1:
+    mspid: Org1MSP
+    peers:
+      - peer0.org1.example.com
+      - peer1.org1.example.com
+
+    certificateAuthorities:
+      - ca-org1
+
+    adminPrivateKey:
+      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/581fa072e48dc2a516f664df94ea687447c071f89fc0b783b147956a08929dcc_sk
+    signedCert:
+      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem
+
+
+  Org2:
+    mspid: Org2MSP
+    peers:
+      - peer0.org2.example.com
+    certificateAuthorities:
+          - ca-org2
+
+    adminPrivateKey:
+      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore/5fcbc56face045c33ad213f276293bbe3c54c2e69936045af5c9c46f38b4eddc_sk
+    signedCert:
+      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/signcerts/Admin@org2.example.com-cert.pem
+
+
+orderers:
+  orderer.example.com:
+    url: grpc://localhost:7050
+    grpcOptions:
+#      ssl-target-name-override: orderer.example.com
+#      sslProvider: openSSL
+#      negotiationType: TLS
+#      hostnameOverride: orderer.example.com
+      grpc-max-send-message-length: 15
+
+peers:
+  peer0.org1.example.com:
+    # this URL is used to send endorsement and query requests
+    url: grpc://localhost:7051
+    # this URL is used to connect the EventHub and registering event listeners
+    eventUrl: grpc://localhost:7053
+    grpcOptions:
+      grpc.http2.keepalive_time: 15
+#      ssl-target-name-override: peer0.org1.example.com
+#      negotiationType: TLS
+#      sslProvider: openSSL
+#      hostnameOverride: peer0.org1.example.com
+#      # TODO: The following causes a NoSuchMethodException to be thrown when sending proposals to the peer...
+#      # grpc.NettyChannelBuilderOption.maxInboundMessageSize: 9000000
+
+
+  peer1.org1.example.com:
+    url: grpc://localhost:7056
+    eventUrl: grpc://localhost:7058
+    grpcOptions:
+      grpc.http2.keepalive_time: 15
+#      ssl-target-name-override: peer0.org1.example.com
+#      negotiationType: TLS
+#      sslProvider: openSSL
+#      hostnameOverride: peer1.org1.example.com
+    tlsCACerts:
+      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/server.crt
+
+
+
+  peer0.org2.example.com:
+    url: grpc://localhost:8051
+    eventUrl: grpc://localhost:8053
+#    grpcOptions:
+#      ssl-target-name-override: peer0.org2.example.com
+#      negotiationType: TLS
+#      grpc.NettyChannelBuilderOption.maxInboundMessageSize: 9000000
+#      sslProvider: openSSL
+#      hostnameOverride: peer0.org2.example.com
+#
+#    tlsCACerts:
+#      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/server.crt
+
+  peer1.org2.example.com:
+    url: grpc://localhost:8056
+    eventUrl: grpc://localhost:8058
+
+
+certificateAuthorities:
+  ca-org1:
+    url: http://localhost:7054
+    # the properties specified under this object are passed to the 'http' client verbatim when
+    # making the request to the Fabric-CA server
+#    httpOptions:
+#      verify: true
+
+    # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
+    # needed to enroll and invoke new users.
+    registrar: #single entitiy
+      enrollId: admin
+      enrollSecret: adminpw
+    # [Optional] The optional name of the CA.
+    caName: ca0
+  ca-org2:
+    url: http://localhost:8054
+      # the properties specified under this object are passed to the 'http' client verbatim when
+      # making the request to the Fabric-CA server
+    httpOptions:
+      verify: true
+    tlsCACerts:
+      path: peerOrganizations/org1.example.com/ca/org1.example.com-cert.pem
+
+    # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
+    # needed to enroll and invoke new users.
+    registrar: # as an array.
+      -  enrollId: admin
+         enrollSecret: adminpw
+      # [Optional] The optional name of the CA.
+            ## caName: ca0 no ca name!
+
