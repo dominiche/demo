@@ -1,0 +1,8 @@
+server:
+    port: 8080
+
+logging:
+    config: classpath:logback-spring.xml
+    level:
+        org.spring.framework: DEBUG
+        org.apache.mybatis: DEBUG

@@ -67,9 +67,9 @@ organizations:
       - ca-org1
 
     adminPrivateKey:
-      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/581fa072e48dc2a516f664df94ea687447c071f89fc0b783b147956a08929dcc_sk
+      path: fabric-demo/src/main/resources/sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/581fa072e48dc2a516f664df94ea687447c071f89fc0b783b147956a08929dcc_sk
     signedCert:
-      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem
+      path: fabric-demo/src/main/resources/sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem
 
 
   Org2:
@@ -80,9 +80,9 @@ organizations:
           - ca-org2
 
     adminPrivateKey:
-      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore/5fcbc56face045c33ad213f276293bbe3c54c2e69936045af5c9c46f38b4eddc_sk
+      path: fabric-demo/src/main/resources/sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore/5fcbc56face045c33ad213f276293bbe3c54c2e69936045af5c9c46f38b4eddc_sk
     signedCert:
-      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/signcerts/Admin@org2.example.com-cert.pem
+      path: fabric-demo/src/main/resources/sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/signcerts/Admin@org2.example.com-cert.pem
 
 
 orderers:
@@ -121,7 +121,7 @@ peers:
 #      sslProvider: openSSL
 #      hostnameOverride: peer1.org1.example.com
     tlsCACerts:
-      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/server.crt
+      path: fabric-demo/src/main/resources/sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org1.example.com/peers/peer1.org1.example.com/tls/server.crt
 
 
 
@@ -136,7 +136,7 @@ peers:
 #      hostnameOverride: peer0.org2.example.com
 #
 #    tlsCACerts:
-#      path: sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/server.crt
+#      path: fabric-demo/src/main/resources/sdkintegration/e2e-2Orgs/v1.1/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/server.crt
 
   peer1.org2.example.com:
     url: grpc://localhost:8056

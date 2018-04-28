@@ -66,7 +66,7 @@ public class BlockInfoController {
             BlockInfoDTO blockInfoDTO = buildBlockInfoDTO(client, blockInfo);
             return ResultDTO.succeedWith(blockInfoDTO);
         } catch (Exception e) {
-            log.error("queryBlockByBlockHash fail, channelName={} ", e);
+            log.error("queryBlockByBlockHash fail, channelName={}, blockHash= ", channelName, blockHash, e);
             return ResultDTO.failed("queryBlockByBlockHash fail, " + e.getMessage());
         }
     }
@@ -155,12 +155,13 @@ public class BlockInfoController {
 //                            KvRwset.KVRWSet rwset = nsRwsetInfo.getRwset();
 //                        });
 
+                    ChaincodeEvent transactionActionInfoEvent = transactionActionInfo.getEvent();
                     TransactionActionInfoDTO transactionActionInfoDTO = TransactionActionInfoDTO.builder()
                             .responseStatus(transactionActionInfo.getResponseStatus())
                             .responseMessage(responseMessage)
 //                                .chainCodeInputArgs(transactionActionInfo.getchain)
-                            .txId(transactionActionInfo.getEvent().getTxId())
-                            .chaincodeName(transactionActionInfo.getEvent().getChaincodeId())
+                            .txId(transactionActionInfoEvent==null?null:transactionActionInfoEvent.getTxId())
+                            .chaincodeName(transactionActionInfoEvent==null?null:transactionActionInfoEvent.getChaincodeId())
 //                                .txReadWriteSets()
                             .build();
                     transactionActionInfoDTOList.add(transactionActionInfoDTO);
