@@ -17,5 +17,4 @@ public class BlockInfoDTO {
 
     private List<EnvelopeInfoDTO> envelopeInfoDTOList;
 
-    private List<String> blockContexts;
 }

@@ -13,12 +13,9 @@ public class TransactionActionInfoDTO {
     private String responseMessage;
     //endorsement info
 
-//    private List<String> chainCodeInputArgs;
+    private List<String> chainCodeInputArgs;
     private String txId;
     private String chaincodeName;
 
-//    private List<String> txReadWriteSets;//json
-
-
-
+//    private List<String> txReadWriteSets;
 }

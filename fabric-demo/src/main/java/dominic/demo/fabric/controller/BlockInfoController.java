@@ -1,7 +1,6 @@
 package dominic.demo.fabric.controller;
 
 import com.google.common.collect.Lists;
-import com.google.protobuf.ByteString;
 import dominic.common.base.ResultDTO;
 import dominic.demo.fabric.config.HFClientConfiguration;
 import dominic.demo.fabric.dto.BlockInfoDTO;
@@ -10,7 +9,6 @@ import dominic.demo.fabric.dto.EnvelopeInfoDTO;
 import dominic.demo.fabric.dto.TransactionActionInfoDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
-import org.hyperledger.fabric.protos.common.Common;
 import org.hyperledger.fabric.sdk.*;
 import org.hyperledger.fabric.sdk.exception.InvalidArgumentException;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hyperledger.fabric.sdk.BlockInfo.EnvelopeType.TRANSACTION_ENVELOPE;
 
@@ -53,6 +50,23 @@ public class BlockInfoController {
         }
     }
 
+    @RequestMapping("queryBlockContextByBlockHash")
+    public String queryBlockContextByBlockHash(@RequestParam String channelName, @RequestParam String blockHash) {
+        HFClient client = HFClientConfiguration.client();
+        Channel channel = client.getChannel(channelName);
+        if (null == channel) {
+            return "can't find channel " + channelName;
+        }
+
+        try {
+            BlockInfo blockInfo = channel.queryBlockByHash(Hex.decodeHex(blockHash));
+            return blockInfo.getBlock().getData().getData(0).toStringUtf8();
+        } catch (Exception e) {
+            log.error("queryBlockByBlockHash fail, channelName={}, blockHash= ", channelName, blockHash, e);
+            return "queryBlockByBlockHash fail, " + e.getMessage();
+        }
+    }
+
     @RequestMapping("queryBlockByBlockHash")
     public ResultDTO<BlockInfoDTO> queryBlockByBlockHash(@RequestParam String channelName, @RequestParam String blockHash) {
         HFClient client = HFClientConfiguration.client();
@@ -62,7 +76,7 @@ public class BlockInfoController {
         }
 
         try {
-            BlockInfo blockInfo = channel.queryBlockByHash(blockHash.getBytes());
+            BlockInfo blockInfo = channel.queryBlockByHash(Hex.decodeHex(blockHash));
             BlockInfoDTO blockInfoDTO = buildBlockInfoDTO(client, blockInfo);
             return ResultDTO.succeedWith(blockInfoDTO);
         } catch (Exception e) {
@@ -108,9 +122,6 @@ public class BlockInfoController {
     }
 
     private BlockInfoDTO buildBlockInfoDTO(HFClient client, BlockInfo blockInfo) throws IOException, InvalidArgumentException {
-        Common.BlockData blockData = blockInfo.getBlock().getData();
-        List<String> blockContexts = blockData.getDataList().stream().map(ByteString::toStringUtf8).collect(Collectors.toList());
-
         long blockNumber = blockInfo.getBlockNumber();
         String previousHash = Hex.encodeHexString(blockInfo.getPreviousHash());
         String currentHash = Hex.encodeHexString(SDKUtils.calculateBlockHash(client,
@@ -122,7 +133,6 @@ public class BlockInfoController {
                 .previousBlockHash(previousHash)
                 .currentBlockHash(currentHash)
                 .envelopeInfoDTOList(envelopeInfoDTOList)
-                .blockContexts(blockContexts)
                 .build();
 
         //fill envelopeInfoDTOList
@@ -148,18 +158,16 @@ public class BlockInfoController {
             if (envelopeInfoType == TRANSACTION_ENVELOPE) {
                 BlockInfo.TransactionEnvelopeInfo transactionEnvelopeInfo = (BlockInfo.TransactionEnvelopeInfo) envelopeInfo;
                 transactionEnvelopeInfo.getTransactionActionInfos().forEach(transactionActionInfo -> {
-                    String responseMessage = new String(transactionActionInfo.getResponseMessageBytes());
-//                        String responseMessage = new String(transactionActionInfo.getResponseMessageBytes(), "UTF-8");
-
-//                        transactionActionInfo.getTxReadWriteSet().getNsRwsetInfos().forEach(nsRwsetInfo -> {
-//                            KvRwset.KVRWSet rwset = nsRwsetInfo.getRwset();
-//                        });
-
+                    String responseMessage = transactionActionInfo.getResponseMessage();
                     ChaincodeEvent transactionActionInfoEvent = transactionActionInfo.getEvent();
+                    List<String> chainCodeInputArgs = Lists.newArrayList();
+                    for (int i=0; i<transactionActionInfo.getChaincodeInputArgsCount(); ++i) {
+                        chainCodeInputArgs.add(new String(transactionActionInfo.getChaincodeInputArgs(i)));
+                    }
                     TransactionActionInfoDTO transactionActionInfoDTO = TransactionActionInfoDTO.builder()
                             .responseStatus(transactionActionInfo.getResponseStatus())
                             .responseMessage(responseMessage)
-//                                .chainCodeInputArgs(transactionActionInfo.getchain)
+                            .chainCodeInputArgs(chainCodeInputArgs)
                             .txId(transactionActionInfoEvent==null?null:transactionActionInfoEvent.getTxId())
                             .chaincodeName(transactionActionInfoEvent==null?null:transactionActionInfoEvent.getChaincodeId())
 //                                .txReadWriteSets()
