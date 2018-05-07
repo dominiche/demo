@@ -44,8 +44,8 @@ public class ChaincodeController {
             InstallProposalRequest installProposalRequest = client.newInstallProposalRequest();
             installProposalRequest.setChaincodeID(chaincodeID);
             installProposalRequest.setChaincodeSourceLocation(new File(chainCodeSourceLocation));
-            installProposalRequest.setChaincodeVersion(ccVersion);
-            installProposalRequest.setChaincodeLanguage(TransactionRequest.Type.GO_LANG);
+//            installProposalRequest.setChaincodeVersion(ccVersion);
+//            installProposalRequest.setChaincodeLanguage(TransactionRequest.Type.GO_LANG);
 
             ResultDTO<Collection<ProposalResponse>> installResultDTO = chaincodeHelper.install(installProposalRequest, client);
             if (!installResultDTO.isSuccess()) {
@@ -114,7 +114,7 @@ public class ChaincodeController {
         try {
             TransactionProposalRequest transactionProposalRequest = client.newTransactionProposalRequest();
             transactionProposalRequest.setChaincodeID(chaincodeID);
-            transactionProposalRequest.setChaincodeLanguage(TransactionRequest.Type.GO_LANG);
+//            transactionProposalRequest.setChaincodeLanguage(TransactionRequest.Type.GO_LANG);
             transactionProposalRequest.setFcn("move");
 //        transactionProposalRequest.setProposalWaitTime(testConfig.getProposalWaitTime());
             transactionProposalRequest.setArgs("a", "b", "100");
