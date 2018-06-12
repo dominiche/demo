@@ -1,6 +1,5 @@
 package dominic.demo.fabric.controller;
 
-import com.alibaba.fastjson.JSON;
 import dominic.common.base.ResultDTO;
 import dominic.demo.fabric.config.HFClientConfiguration;
 import dominic.demo.fabric.dto.chaincode.ChaincodeIdDTO;
@@ -178,15 +177,16 @@ public class ChaincodeCustomController {
             ResultDTO<BlockEvent.TransactionEvent> eventResultDTO = chaincodeHelper.transact(transactionProposalRequest);
             if (!eventResultDTO.isSuccess()) {
                 log.error("chaincode transaction fail, chaincodeId: {}, fcn: {}, args: {}, messages: ",
-                        JSON.toJSONString(chaincodeId), transactionProposalRequest.getFcn(), transactionProposalRequest.getArgs(), eventResultDTO.getMessage());
+                        chaincodeId, transactionProposalRequest.getFcn(), transactionProposalRequest.getArgs(), eventResultDTO.getMessage());
                 return ResultDTO.failed(String.format("chaincode transaction fail: %s", eventResultDTO.getMessage()));
             }
 
             BlockEvent.TransactionEvent event = eventResultDTO.getModel();
-            return ResultDTO.succeedWith("Transaction success, transactionId is " + event.getTransactionID());
+            return ResultDTO.succeedWith("Transaction success, transactionId is " + event.getTransactionID()
+                    + " payload: " + event.getTransactionActionInfo(0).getResponseMessage());
         } catch (Exception e) {
             log.error("chaincode transaction fail, chaincodeId: {} ",
-                    JSON.toJSONString(chaincodeId), e);
+                    chaincodeId, e);
             return ResultDTO.failed(String.format("instantiate chaincode on channel:%s fail: %s", channelName, e.getMessage()));
         }
     }
@@ -213,7 +213,7 @@ public class ChaincodeCustomController {
         ChaincodeHelper chaincodeHelper = ChaincodeHelper.getHelper(channel);
         QueryByChaincodeRequest queryByChaincodeRequest = client.newQueryProposalRequest();
         queryByChaincodeRequest.setChaincodeID(chaincodeId);
-        queryByChaincodeRequest.setFcn("query");
+        queryByChaincodeRequest.setFcn(dto.getFcn());
         if (ArrayUtils.isNotEmpty(dto.getArgs())) {
             queryByChaincodeRequest.setArgs(dto.getArgs());
         }
