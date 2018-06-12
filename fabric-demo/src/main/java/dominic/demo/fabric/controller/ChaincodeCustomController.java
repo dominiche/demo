@@ -194,8 +194,8 @@ public class ChaincodeCustomController {
     @RequestMapping("queryInfoByChaincode")
     public ResultDTO<Collection<String>> queryInfoByChaincode(@RequestBody ChaincodeTransactDTO dto) {
         if (null == dto || StringUtils.isEmpty(dto.getChannelName())
-//                || StringUtils.isEmpty(dto.getFcn())
-//                || ArrayUtils.isEmpty(dto.getArgs())
+                || StringUtils.isEmpty(dto.getFcn())
+                || ArrayUtils.isEmpty(dto.getArgs())
                 ) {
             return ResultDTO.failed("illegal arguments!!");
         }
