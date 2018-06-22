@@ -13,8 +13,7 @@ services:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
     ports:
       - "7054:7054"
-    command: sh -c 'fabric-ca-server start -n ca0 ${V11_IDENTITIES_ALLOWREMOVE} ${V11_AFFILIATIONS_ALLOWREMOVE} --registry.maxenrollments -1 --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/fcf776b02a05600408d0be9d9752afc59f64950b721cacb363b5b95a0fea6216_sk -b admin:adminpw ${ORG_HYPERLEDGER_FABRIC_SDKTEST_INTEGRATIONTESTS_CA_TLS} --tls.certfile /etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem --tls.keyfile /etc/hyperledger/fabric-ca-server-config/fcf776b02a05600408d0be9d9752afc59f64950b721cacb363b5b95a0fea6216_sk -d'
-
+    command: sh -c 'fabric-ca-server start -n ca0 ${V11_IDENTITIES_ALLOWREMOVE} ${V11_AFFILIATIONS_ALLOWREMOVE} --registry.maxenrollments -1 --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/688cb2c7107e84fd883a22c9c416add1644bb8a4c6d19f827bba07d832def1e8_sk -b admin:adminpw ${ORG_HYPERLEDGER_FABRIC_SDKTEST_INTEGRATIONTESTS_CA_TLS} --tls.certfile /etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem --tls.keyfile /etc/hyperledger/fabric-ca-server-config/fcf776b02a05600408d0be9d9752afc59f64950b721cacb363b5b95a0fea6216_sk -d'
     volumes:
       - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org1.example.com/ca/:/etc/hyperledger/fabric-ca-server-config:ro
     container_name: ca_peerOrg1
@@ -25,7 +24,7 @@ services:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
     ports:
       - "8054:7054"
-    command: sh -c 'fabric-ca-server start --registry.maxenrollments -1 --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/b59bba37975dafcc4a93984aa01d3d29b64894617db9e0c9a2d486b5273cbd27_sk -b admin:adminpw ${ORG_HYPERLEDGER_FABRIC_SDKTEST_INTEGRATIONTESTS_CA_TLS} --tls.certfile /etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem --tls.keyfile /etc/hyperledger/fabric-ca-server-config/b59bba37975dafcc4a93984aa01d3d29b64894617db9e0c9a2d486b5273cbd27_sk -d'
+    command: sh -c 'fabric-ca-server start --registry.maxenrollments -1 --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/859c9509c2f23d80838c1e796868053ae03bb06d5db2372a7c50339ec4bfe661_sk -b admin:adminpw ${ORG_HYPERLEDGER_FABRIC_SDKTEST_INTEGRATIONTESTS_CA_TLS} --tls.certfile /etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem --tls.keyfile /etc/hyperledger/fabric-ca-server-config/b59bba37975dafcc4a93984aa01d3d29b64894617db9e0c9a2d486b5273cbd27_sk -d'
     volumes:
       - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/crypto-config/peerOrganizations/org2.example.com/ca/:/etc/hyperledger/fabric-ca-server-config:ro
     container_name: ca_peerOrg2
@@ -206,7 +205,7 @@ services:
 
   peer0.org1.example.com:
     extends:
-      file: peer-base.yaml
+      file: base.yaml
       service: peer-base
     container_name: peer0.org1.example.com
     environment:
@@ -221,10 +220,14 @@ services:
     ports:
       - 7051:7051
       - 7053:7053
+    depends_on:
+      - orderer1.example.com
+      - orderer2.example.com
+      - orderer3.example.com
 
   peer1.org1.example.com:
     extends:
-      file: peer-base.yaml
+      file: base.yaml
       service: peer-base
     container_name: peer1.org1.example.com
     environment:
@@ -239,10 +242,14 @@ services:
     ports:
       - 7056:7051
       - 7058:7053
+    depends_on:
+      - orderer1.example.com
+      - orderer2.example.com
+      - orderer3.example.com
 
   peer0.org2.example.com:
     extends:
-      file: peer-base.yaml
+      file: base.yaml
       service: peer-base
     container_name: peer0.org2.example.com
     environment:
@@ -257,10 +264,14 @@ services:
     ports:
       - 8051:7051
       - 8053:7053
+    depends_on:
+      - orderer1.example.com
+      - orderer2.example.com
+      - orderer3.example.com
 
   peer1.org2.example.com:
     extends:
-      file: peer-base.yaml
+      file: base.yaml
       service: peer-base
     container_name: peer1.org2.example.com
     environment:
@@ -275,6 +286,10 @@ services:
     ports:
        - 8056:7051
        - 8058:7053
+    depends_on:
+      - orderer1.example.com
+      - orderer2.example.com
+      - orderer3.example.com
 
 #  cli:
 #    container_name: cli
@@ -309,12 +324,12 @@ services:
 #      - peer0.org2.example.com
 #      - peer1.org2.example.com
 
-  configtxlator:
-      image: hyperledger/fabric-tools${IMAGE_TAG_FABRIC}
-      ports:
-        - "7059:7059"
-      command: /usr/local/bin/configtxlator start
-      container_name: configtxlator
-
-  ccenv:
-    image: hyperledger/fabric-ccenv${IMAGE_TAG_FABRIC}
+#  configtxlator:
+#      image: hyperledger/fabric-tools${IMAGE_TAG_FABRIC}
+#      ports:
+#        - "7059:7059"
+#      command: /usr/local/bin/configtxlator start
+#      container_name: configtxlator
+#
+#  ccenv:
+#    image: hyperledger/fabric-ccenv${IMAGE_TAG_FABRIC}

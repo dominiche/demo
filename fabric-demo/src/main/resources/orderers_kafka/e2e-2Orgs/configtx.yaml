@@ -147,8 +147,8 @@ Orderer: &OrdererDefaults
 
     Addresses:
         - orderer1.example.com:7050
-        - orderer2.example.com:7049
-        - orderer3.example.com:7048
+        - orderer2.example.com:7050
+        - orderer3.example.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s
@@ -181,8 +181,8 @@ Orderer: &OrdererDefaults
         # this list to identify the brokers of the ordering service.
         # NOTE: Use IP:port notation.
         Brokers:
-            - k1:9091
-            - k3:9093
+            - k1:9092
+            - k3:9092
 
     # Organizations lists the orgs participating on the orderer side of the
     # network.

@@ -13,7 +13,7 @@ services:
       # the following setting starts chaincode containers on the same
       # bridge network as the peers
       # https://docs.docker.com/compose/networking/
-      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=sdkintegration_default
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=ordererskafka_default
       #- CORE_LOGGING_LEVEL=ERROR
       - CORE_LOGGING_LEVEL=DEBUG
       - CORE_PEER_ENDORSER_ENABLED=true
@@ -37,7 +37,7 @@ services:
 
   zookeeper:
       image: hyperledger/fabric-zookeeper
-      restart: always
+#      restart: always
       environment:
         - quorumListenOnAllIPs=true
       ports:
@@ -47,7 +47,7 @@ services:
 
   kafka:
     image: hyperledger/fabric-kafka
-    restart: always
+#    restart: always
     environment:
       # message.max.bytes
       # The maximum size of envelope that the broker can receive.
@@ -55,32 +55,34 @@ services:
       - KAFKA_REPLICA_FETCH_MAX_BYTES=103809024 # 99 * 1024 * 1024 B
       - KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE=false
       - KAFKA_LOG_RETENTION_MS=-1
-    ports:
-      - '9092'
+#    ports:
+#      - '9092'
 
   orderer.example.com:
       image: hyperledger/fabric-orderer${IMAGE_TAG_FABRIC}
-          environment:
-            - ORDERER_GENERAL_LOGLEVEL=debug
-            - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
-            - ORDERER_GENERAL_GENESISMETHOD=file
-            - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/orderer.block
-            - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
-            - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer/msp
-            - ORDERER_GENERAL_TLS_ENABLED=${ORG_HYPERLEDGER_FABRIC_SDKTEST_INTEGRATIONTESTS_TLS}
-            - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/msp/orderer/tls/server.key
-            - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/msp/orderer/tls/server.crt
-            - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/msp/orderer/tls/ca.crt]
-            - GRPC_TRACE=all=true,
-            - GRPC_VERBOSITY=debug
-            - ORDERER_GENERAL_AUTHENTICATION_TIMEWINDOW=3600s #Not for production -- remove.
-          working_dir: /opt/gopath/src/github.com/hyperledger/fabric
-          command: orderer
-          volumes:
-           - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/orderer.block:/etc/hyperledger/configtx/orderer.block:ro
-      networks:
-        default:
-          aliases:
-            - example
+      environment:
+#        - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=example_default
+        - ORDERER_GENERAL_LOGLEVEL=debug
+        - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+#        - ORDERER_GENERAL_LISTENPORT=7050
+        - ORDERER_GENERAL_GENESISMETHOD=file
+        - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/orderer.block
+        - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+        - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer/msp
+        - ORDERER_GENERAL_TLS_ENABLED=${ORG_HYPERLEDGER_FABRIC_SDKTEST_INTEGRATIONTESTS_TLS}
+        - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/msp/orderer/tls/server.key
+        - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/msp/orderer/tls/server.crt
+        - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/msp/orderer/tls/ca.crt]
+        - GRPC_TRACE=all=true,
+        - GRPC_VERBOSITY=debug
+        - ORDERER_GENERAL_AUTHENTICATION_TIMEWINDOW=3600s #Not for production -- remove.
+      working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+      command: orderer
+      volumes:
+       - ./e2e-2Orgs/${FAB_CONFIG_GEN_VERS}/orderer.block:/etc/hyperledger/configtx/orderer.block:ro
+#      networks:
+#        default:
+#          aliases:
+#            - example
       ports:
         - "7050"
