@@ -10,4 +10,7 @@ public interface PathUtil {
      * 一种方案是把network-config写成json形式，存到数据库中，json中的密钥文件路径就使用在服务器中的绝对路径。
      */
     String parentPath = "fabric-demo/src/main/resources/";
+
+//    String NET = "sdkintegration";
+    String NET = "orderers_kafka";
 }

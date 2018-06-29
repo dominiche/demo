@@ -13,7 +13,7 @@ public class NetworkConfiguration {
 
     static {
         try {
-            networkConfig = NetworkConfig.fromYamlFile(new File(PathUtil.parentPath + "sdkintegration/network_configs/network-config.yaml"));
+            networkConfig = NetworkConfig.fromYamlFile(new File(PathUtil.parentPath + PathUtil.NET + "/network_configs/network-config.yaml"));
         } catch (Exception e) {
             log.info("load networkConfig fail: ", e);
             throw new RuntimeException(e);

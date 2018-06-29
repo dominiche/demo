@@ -22,8 +22,8 @@ import java.util.Map;
 @RequestMapping("chaincode")
 public class ChaincodeController {
 
-    private String chainCodeSourceLocation = PathUtil.parentPath + "orderers_kafka/gocc/sample1";
-    private String chaincodeEndorsementPolicyPath = PathUtil.parentPath + "orderers_kafka/chaincodeendorsementpolicy.yaml";
+    private String chainCodeSourceLocation = PathUtil.parentPath + PathUtil.NET + "/gocc/sample1";
+    private String chaincodeEndorsementPolicyPath = PathUtil.parentPath + PathUtil.NET + "/chaincodeendorsementpolicy.yaml";
 
     private String ccName = "example_cc_go";
     private String ccVersion = "1";

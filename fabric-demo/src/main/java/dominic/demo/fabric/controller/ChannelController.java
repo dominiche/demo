@@ -21,7 +21,7 @@ import java.io.File;
 @RequestMapping("channel")
 public class ChannelController {
 
-    private String channelConfigFilePath = PathUtil.parentPath + "orderers_kafka/e2e-2Orgs/v1.1/";
+    private String channelConfigFilePath = PathUtil.parentPath + PathUtil.NET + "/e2e-2Orgs/v1.1/";
 
     @RequestMapping("create/{channelName}")
     public ResultDTO<Integer> createChannel(@PathVariable("channelName") String channelName, @RequestParam String orgName) {
