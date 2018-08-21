@@ -50,12 +50,15 @@ public class ChaincodeCustomController {
         String toLowerCase = dto.getChaincodeLanguage().toLowerCase();
         if ("go".equals(toLowerCase)) {
             chaincodeLanguage = TransactionRequest.Type.GO_LANG;
-        } else if ("java".equals(toLowerCase)) {
-            chaincodeLanguage = TransactionRequest.Type.JAVA;
-            //chaincodePath must be null for Java chaincode
-            chaincodeId = ChaincodeID.newBuilder().setName(chaincodeId.getName())
-                    .setVersion(chaincodeId.getVersion()).build();
-        } else if ("node".equals(toLowerCase)) {
+        }
+        //java not supported now
+//        else if ("java".equals(toLowerCase)) {
+//            chaincodeLanguage = TransactionRequest.Type.JAVA;
+//            //chaincodePath must be null for Java chaincode
+//            chaincodeId = ChaincodeID.newBuilder().setName(chaincodeId.getName())
+//                    .setVersion(chaincodeId.getVersion()).build();
+//        }
+        else if ("node".equals(toLowerCase)) {
             chaincodeLanguage = TransactionRequest.Type.NODE;
         } else {
             return ResultDTO.failed("chaincodeLanguage not supported!!");
@@ -117,9 +120,14 @@ public class ChaincodeCustomController {
             InstantiateProposalRequest instantiateProposalRequest = client.newInstantiationProposalRequest();
 //        instantiateProposalRequest.setProposalWaitTime(testConfig.getProposalWaitTime());
             instantiateProposalRequest.setChaincodeID(chaincodeId);
-            instantiateProposalRequest.setFcn("init");
+            instantiateProposalRequest.setFcn(dto.getFcn());
+            if (StringUtils.isEmpty(instantiateProposalRequest.getFcn())) {
+                instantiateProposalRequest.setFcn("init");
+            }
             if (ArrayUtils.isNotEmpty(dto.getArgs())) {
                 instantiateProposalRequest.setArgs(dto.getArgs());
+            } else {
+                instantiateProposalRequest.setArgs(new String[]{});
             }
 
             Map<String, byte[]> tm = new HashMap<>();

@@ -6,7 +6,7 @@ import lombok.Data;
 public class ChaincodeInstantiateDTO {
     private String channelName;
     private ChaincodeIdDTO chaincodeId;
-//    private String fcn;
+    private String fcn;
     private String[] args;
 
     private String chaincodeEndorsementPolicyPath;
