@@ -117,28 +117,28 @@ public class ChaincodeCustomController {
 
         ChaincodeHelper chaincodeHelper = ChaincodeHelper.getHelper(channel);
         try {
-            InstantiateProposalRequest instantiateProposalRequest = client.newInstantiationProposalRequest();
-//        instantiateProposalRequest.setProposalWaitTime(testConfig.getProposalWaitTime());
-            instantiateProposalRequest.setChaincodeID(chaincodeId);
-            instantiateProposalRequest.setFcn(dto.getFcn());
-            if (StringUtils.isEmpty(instantiateProposalRequest.getFcn())) {
-                instantiateProposalRequest.setFcn("init");
+            InstantiateProposalRequest upgradeProposalRequest = client.newInstantiationProposalRequest();
+//        upgradeProposalRequest.setProposalWaitTime(testConfig.getProposalWaitTime());
+            upgradeProposalRequest.setChaincodeID(chaincodeId);
+            upgradeProposalRequest.setFcn(dto.getFcn());
+            if (StringUtils.isEmpty(upgradeProposalRequest.getFcn())) {
+                upgradeProposalRequest.setFcn("init");
             }
             if (ArrayUtils.isNotEmpty(dto.getArgs())) {
-                instantiateProposalRequest.setArgs(dto.getArgs());
+                upgradeProposalRequest.setArgs(dto.getArgs());
             } else {
-                instantiateProposalRequest.setArgs(new String[]{});
+                upgradeProposalRequest.setArgs(new String[]{});
             }
 
             Map<String, byte[]> tm = new HashMap<>();
             tm.put("HyperLedgerFabric", "InstantiateProposalRequest:JavaSDK".getBytes(StandardCharsets.UTF_8));
             tm.put("method", "InstantiateProposalRequest".getBytes(StandardCharsets.UTF_8));
-            instantiateProposalRequest.setTransientMap(tm);
+            upgradeProposalRequest.setTransientMap(tm);
             ChaincodeEndorsementPolicy chaincodeEndorsementPolicy = new ChaincodeEndorsementPolicy();
             chaincodeEndorsementPolicy.fromYamlFile(new File(dto.getChaincodeEndorsementPolicyPath()));
-            instantiateProposalRequest.setChaincodeEndorsementPolicy(chaincodeEndorsementPolicy);
+            upgradeProposalRequest.setChaincodeEndorsementPolicy(chaincodeEndorsementPolicy);
 
-            ResultDTO<BlockEvent.TransactionEvent> eventResultDTO = chaincodeHelper.instantiate(instantiateProposalRequest);
+            ResultDTO<BlockEvent.TransactionEvent> eventResultDTO = chaincodeHelper.instantiate(upgradeProposalRequest);
             if (!eventResultDTO.isSuccess()) {
                 log.error("instantiate fail: {}", eventResultDTO.getMessage());
                 return ResultDTO.failed(String.format("instantiate chaincode fail: %s", eventResultDTO.getMessage()));
@@ -149,6 +149,58 @@ public class ChaincodeCustomController {
         } catch (Exception e) {
             log.error("instantiate chaincode on channel:{} fail: ", channelName, e);
             return ResultDTO.failed(String.format("instantiate chaincode on channel:%s fail: %s", channelName, e.getMessage()));
+        }
+    }
+
+
+    @RequestMapping("upgrade")
+    public ResultDTO<String> upgrade(@RequestBody ChaincodeInstantiateDTO dto) {
+        if (null == dto || StringUtils.isEmpty(dto.getChannelName())
+                || StringUtils.isEmpty(dto.getChaincodeEndorsementPolicyPath())
+                ) {
+            return ResultDTO.failed("illegal arguments!!");
+        }
+
+        String channelName = dto.getChannelName();
+        ChaincodeID chaincodeId = getChaincodeId(dto.getChaincodeId());
+        if (null == chaincodeId) return ResultDTO.failed("illegal chaincodeId!!");
+
+        HFClient client = HFClientConfiguration.client();
+        Channel channel = client.getChannel(channelName);
+        if (null == channel) {
+            return ResultDTO.failed("can't find channel " + channelName);
+        }
+
+        ChaincodeHelper chaincodeHelper = ChaincodeHelper.getHelper(channel);
+        try {
+            UpgradeProposalRequest upgradeProposalRequest = client.newUpgradeProposalRequest();
+//        upgradeProposalRequest.setProposalWaitTime(testConfig.getProposalWaitTime());
+            upgradeProposalRequest.setChaincodeID(chaincodeId);
+            upgradeProposalRequest.setFcn(dto.getFcn());
+            if (StringUtils.isEmpty(upgradeProposalRequest.getFcn())) {
+                upgradeProposalRequest.setFcn("init");
+            }
+            if (ArrayUtils.isNotEmpty(dto.getArgs())) {
+                upgradeProposalRequest.setArgs(dto.getArgs());
+            } else {
+                upgradeProposalRequest.setArgs(new String[]{});
+            }
+
+            ChaincodeEndorsementPolicy chaincodeEndorsementPolicy = new ChaincodeEndorsementPolicy();
+            chaincodeEndorsementPolicy.fromYamlFile(new File(dto.getChaincodeEndorsementPolicyPath()));
+            upgradeProposalRequest.setChaincodeEndorsementPolicy(chaincodeEndorsementPolicy);
+
+            ResultDTO<BlockEvent.TransactionEvent> eventResultDTO = chaincodeHelper.upgrade(upgradeProposalRequest);
+            if (!eventResultDTO.isSuccess()) {
+                log.error("upgrade fail: {}", eventResultDTO.getMessage());
+                return ResultDTO.failed(String.format("upgrade chaincode fail: %s", eventResultDTO.getMessage()));
+            }
+
+            BlockEvent.TransactionEvent event = eventResultDTO.getModel();
+            return ResultDTO.succeedWith("upgrade chaincode success, transactionId is " + event.getTransactionID());
+        } catch (Exception e) {
+            log.error("upgrade chaincode on channel:{} fail: ", channelName, e);
+            return ResultDTO.failed(String.format("upgrade chaincode on channel:%s fail: %s", channelName, e.getMessage()));
         }
     }
 
@@ -191,7 +243,7 @@ public class ChaincodeCustomController {
 
             BlockEvent.TransactionEvent event = eventResultDTO.getModel();
             return ResultDTO.succeedWith("Transaction success, transactionId is " + event.getTransactionID()
-                    + " payload: " + event.getTransactionActionInfo(0).getResponseMessage());
+                    + " payload: " + new String(event.getTransactionActionInfo(0).getProposalResponsePayload(), "UTF-8"));
         } catch (Exception e) {
             log.error("chaincode transaction fail, chaincodeId: {} ",
                     chaincodeId, e);
