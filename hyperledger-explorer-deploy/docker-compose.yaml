@@ -1,0 +1,43 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+version: '2'
+
+services:
+  postgresql:
+    container_name: postgresql
+    image: postgres:10.5
+    environment:
+      - POSTGRES_PASSWORD=mytest
+    volumes:
+     - ./postgres/pgdata/:/var/lib/postgresql/data
+     - ./postgres/pgsql/:/opt/pgsql:ro
+    ports:
+      - 5432:5432
+
+  explorer:
+    container_name: explorer
+    image: dominic/blockchain-explorer:0.1
+    volumes:
+      - ./config.json:/blockchain-explorer/app/platform/fabric/config.json:ro
+      - ./explorerconfig.json:/blockchain-explorer/app/explorerconfig.json:ro
+      - ../fabric-demo/src/main/resources/sdkintegration/e2e-2Orgs/v1.1/crypto-config/:/blockchain-explorer/fabric-path/crypto-config:ro
+#      - ../fabric-demo/src/main/resources/sdkintegration/bin/:/blockchain-explorer/fabric-path/bin:ro
+    command: node main.js
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgresql
+    networks:
+      - default
+      - sdkintegration_default
+
+
+networks:
+  sdkintegration_default:
+    external: true 
+
+
+

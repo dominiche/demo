@@ -1,0 +1,16 @@
+{
+  "persistence": "postgreSQL",
+  "platforms": ["fabric"],
+  "postgreSQL": {
+    "host": "postgresql",
+    "port": "5432",
+    "database": "fabricexplorer",
+    "username": "postgres",
+    "passwd": "mytest"
+  },
+  "sync": {
+    "type": "local",
+    "platform": "fabric",
+    "blocksSyncTime": "3"
+  }
+}
