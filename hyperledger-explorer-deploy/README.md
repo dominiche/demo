@@ -28,5 +28,5 @@ docker-compose up -d
 ```
 
 TODO:   
-    problems: the home page is blank(http://localhost:8080/), though the swagger page is ok(http://localhost:8080/api-docs/)
+    problems: the home page is blank(http://localhost:8080/), though the swagger page is ok(http://localhost:8080/api-docs/)   
     2018/10/08 already fix.
