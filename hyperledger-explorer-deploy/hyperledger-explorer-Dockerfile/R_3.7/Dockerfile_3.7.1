@@ -1,0 +1,29 @@
+# Dockerfile for Hyperledger blockchain-explorer image
+
+FROM node:8.11.3-alpine
+
+EXPOSE 8080
+
+# clone latest code from github
+# RUN git clone --single-branch -b release-3.7 --depth 1 https://github.com/hyperledger/blockchain-explorer
+
+WORKDIR /blockchain-explorer
+
+COPY blockchain-explorer /blockchain-explorer
+
+RUN apk add --no-cache --virtual npm-deps python make g++ && \
+    python -m ensurepip && \
+    rm -r /usr/lib/python*/ensurepip && \
+    pip install --upgrade pip setuptools && \
+	rm -r /root/.cache
+
+RUN npm install --save grpc@1.15.1 --registry=http://registry.npm.taobao.org && npm build --registry=http://registry.npm.taobao.org
+
+RUN cd client && npm install --registry=http://registry.npm.taobao.org && yarn build
+
+# remove installed packages to free space
+RUN apk del npm-deps
+
+#VOLUME /blockchain-explorer
+
+CMD node main.js && tail -f /dev/null

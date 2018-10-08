@@ -19,7 +19,7 @@ services:
 
   explorer:
     container_name: explorer
-    image: dominic/blockchain-explorer:0.1
+    image: dominic/blockchain-explorer:3.7.1
     volumes:
       - ./config.json:/blockchain-explorer/app/platform/fabric/config.json:ro
       - ./explorerconfig.json:/blockchain-explorer/app/explorerconfig.json:ro
