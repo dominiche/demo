@@ -2,8 +2,8 @@ base on hyperledger/blockchain-explorer release-3.6
 
 0. build blockchain-explorer image
 ```$sh
-cd hyperledger-explorer-Dockerfile
-docker build -t dominic/blockchain-explorer:0.1 .
+cd hyperledger-explorer-Dockerfile/R_3.7
+docker build -f Dockerfile_3.7.1 -t dominic/blockchain-explorer:3.7.1 .
 ```
 1. start fabric network in demo/fabric-demo/src/main/resources/sdkintegration
     start fabric network. then, run the network: create channel "foo", install and instantiate a chaincode, do some transactions
@@ -29,3 +29,4 @@ docker-compose up -d
 
 TODO:   
     problems: the home page is blank(http://localhost:8080/), though the swagger page is ok(http://localhost:8080/api-docs/)
+    2018/10/08 already fix.
